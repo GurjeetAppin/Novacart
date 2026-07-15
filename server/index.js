@@ -1,60 +1,58 @@
 const express = require("express");
 const cors = require("cors");
-const dotenv = require("dotenv"); // get the configartion form this package.
-const connectDB = require('./config/db'); // import the database connection code.
+const dotenv = require("dotenv");
+const connectDB = require("./config/db");
 const path = require("path");
 
-dotenv.config(); // This is get all the configartion from the dotenv file and set inside a index.js file
-connectDB(); // Run the mongoDb connection 
-const app = express(); // Create an instance of the Express application. The app variable will be used to define routes, middleware, and other configurations for the server.
-// Create an instance of the Express application
-app.use(cors(
-    {
-        origin: ["http://localhost:3000", "http://127.0.0.1:3000", process.env.FRONTEND_URL],
+dotenv.config();
+connectDB();
+
+const app = express();
+
+app.use(
+    cors({
+        origin: [
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+            process.env.FRONTEND_URL,
+        ],
         methods: ["GET", "POST", "PUT", "DELETE"],
         allowedHeaders: ["Content-Type", "Authorization"],
-        credentials: true
-    }
-)); // This is used to allow the cross origin request from the frontend. Here we add a ReactJS project details
-app.use(express.json()); // This is used to parse the json data from the request body.
-app.use(express.urlencoded({ extended: true })); // This is used to parse the urlencoded data from the request body.
+        credentials: true,
+    })
+);
 
-app.get("/", (req, res) => {
-    res.send("Novacart backend is working properly!");
-});
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// User/Auth routes
-app.use("/api/auth", require('./routes/authRoutes'));
-
-// Products Routes
+// API Routes
+app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/products", require("./routes/productRoutes"));
-// Orders Routes
 app.use("/api/orders", require("./routes/orderRoutes"));
-// Payment Routes
 app.use("/api/payment", require("./routes/paymentRoutes"));
-// Analytics Routes (This is use for Admin)
 app.use("/api/analytics", require("./routes/analyticsRoutes"));
 
 if (process.env.NODE_ENV === "production") {
-    app.use(express.static(path.join(__dirname, "../client/build")));
 
-    app.get("/*", (req, res) => {
-        res.sendFile(path.resolve(__dirname, "../client/build", "index.html"));
+    const buildPath = path.join(__dirname, "../client/build");
+
+    app.use(express.static(buildPath));
+
+    // Express 5 catch-all
+    app.use((req, res) => {
+        res.sendFile(path.join(buildPath, "index.html"));
     });
+
 } else {
+
     app.get("/", (req, res) => {
         res.send("Novacart backend is working properly!");
     });
+
 }
 
-// Cart Routes
-//app.use("/api/cart", require("./routes/cartRoutes"));
+const PORT = process.env.PORT || 5000;
 
-// Define a port where the server is running.
-const PORT = process.env.PORT || 5000; // Set the port number for the server to listen on. The value is retrieved from an environment variable (process.env.PORT) if available; otherwise, it defaults to 5000. This allows for flexibility in specifying the port number based on the deployment environment (e.g., development, production).
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
-
-
-
