@@ -18,22 +18,22 @@ app.use(express.json()); // This is used to parse the json data from the request
 app.use(express.urlencoded({ extended: true })); // This is used to parse the urlencoded data from the request body.
 
 app.get("/", (req, res) => {
-    // Serve React static files
-app.use(express.static(path.join(__dirname, "../client/build")));
+ res.send("Novacart backend is working properly!");
+});
+// User/Auth routes
+app.use("/api/auth", require('./routes/authRoutes')); 
 
-// API routes
-app.use("/api/auth", require("./routes/authRoutes"));
+// Products Routes
 app.use("/api/products", require("./routes/productRoutes"));
+// Orders Routes
 app.use("/api/orders", require("./routes/orderRoutes"));
+// Payment Routes
 app.use("/api/payment", require("./routes/paymentRoutes"));
+// Analytics Routes (This is use for Admin)
 app.use("/api/analytics", require("./routes/analyticsRoutes"));
 
-// React fallback
-app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../client/build/index.html"));
-});
-});
-
+// Cart Routes
+//app.use("/api/cart", require("./routes/cartRoutes"));
 
 // Define a port where the server is running.
 const PORT = process.env.PORT || 5000; // Set the port number for the server to listen on. The value is retrieved from an environment variable (process.env.PORT) if available; otherwise, it defaults to 5000. This allows for flexibility in specifying the port number based on the deployment environment (e.g., development, production).
