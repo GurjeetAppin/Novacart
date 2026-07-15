@@ -18,24 +18,21 @@ app.use(express.json()); // This is used to parse the json data from the request
 app.use(express.urlencoded({ extended: true })); // This is used to parse the urlencoded data from the request body.
 
 app.get("/", (req, res) => {
-    res.send("Novacart backend is working properly!");
-});
+    // Serve React static files
+app.use(express.static(path.join(__dirname, "../client/build")));
 
-// User/Auth routes
-app.use("/api/auth", require('./routes/authRoutes')); 
-
-// Products Routes
+// API routes
+app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/products", require("./routes/productRoutes"));
-// Orders Routes
 app.use("/api/orders", require("./routes/orderRoutes"));
-// Payment Routes
 app.use("/api/payment", require("./routes/paymentRoutes"));
-// Analytics Routes (This is use for Admin)
 app.use("/api/analytics", require("./routes/analyticsRoutes"));
 
-// Cart Routes
-//app.use("/api/cart", require("./routes/cartRoutes"));
-
+// React fallback
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../client/build/index.html"));
+});
+});
 
 
 // Define a port where the server is running.
